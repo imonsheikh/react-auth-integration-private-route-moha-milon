@@ -1,11 +1,13 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { createContext } from 'react';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { createContext, useState } from 'react';
 import { auth } from '../firebase.init';
 
 const AuthContext = createContext(null)
 
 
 const AuthProvider = ({children}) => {
+    const [user,setUser] = useState(null)
+
     const name = 'Potato alu mai' 
     
     //Create user reusable function
@@ -18,9 +20,23 @@ const AuthProvider = ({children}) => {
        return signInWithEmailAndPassword(auth,email,password)
      }
 
+     //Set observer
+     onAuthStateChanged(auth, currentUser =>{
+        if(currentUser){
+            console.log('Currently Logged user', currentUser);
+            setUser(currentUser)
+        }
+        else{
+            console.log('No user login ');
+            setUser(null)
+            
+        }
+     })
+
     const authInfo = {
         // name: name OR 
         name,
+        user,
         createUser,
         signInUser
     }
