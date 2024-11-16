@@ -13,7 +13,16 @@ const Register = () => {
       const email = e.target.email.value
       const password = e.target.password.value
       console.log(name,email,password);
-      
+
+      //create user
+      createUser(email,password)
+      .then(result => {
+        console.log(result.user);   
+      })
+      .catch(error => {
+        console.log("ERRORRR", error.message);
+        
+      })
     }
 
     return (
