@@ -1,14 +1,14 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { createContext, useState } from 'react';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import React, { createContext, useEffect, useState } from 'react';
 import { auth } from '../firebase.init';
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext(null)
 
 
 const AuthProvider = ({children}) => {
     const [user,setUser] = useState(null)
 
-    const name = 'Potato alu mai' 
+    // const name = 'Potato alu mai' 
     
     //Create user reusable function
     const createUser = (email,password) =>{
@@ -20,25 +20,41 @@ const AuthProvider = ({children}) => {
        return signInWithEmailAndPassword(auth,email,password)
      }
 
+     //sign Out
+     const signOutUser = () => {
+        return signOut(auth)
+     }
+    
+     useEffect(() => { 
      //Set observer
-     onAuthStateChanged(auth, currentUser =>{
-        if(currentUser){
-            console.log('Currently Logged user', currentUser);
-            setUser(currentUser)
-        }
-        else{
-            console.log('No user login ');
-            setUser(null)
-            
-        }
+     const unSubscribe = onAuthStateChanged(auth, currentUser =>{
+        // if(currentUser){
+        //     console.log('Currently Logged user', currentUser);
+        //     setUser(currentUser)
+        // }
+        // else{
+        //     console.log('No user login ');
+        //     setUser(null)       
+        // }
+
+        // ============ OR ============
+        console.log('Current user', currentUser);
+        setUser(currentUser) 
      })
+   
+     return () => {
+        unSubscribe()
+     }
+
+     },[])
 
     const authInfo = {
         // name: name OR 
-        name,
+        // name,
         user,
         createUser,
-        signInUser
+        signInUser,
+        signOutUser
     }
 
     return (
@@ -48,7 +64,7 @@ const AuthProvider = ({children}) => {
     );
 };
 
-export  {AuthProvider, AuthContext};
+export  {AuthProvider };
 
 /**
  * 1. Create context with null as default
